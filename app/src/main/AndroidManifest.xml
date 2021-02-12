@@ -12,6 +12,11 @@
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB1xQvSYUeWZdhtsiiEp6APjWDgiTl9d1o"/>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings">
+        </activity>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
