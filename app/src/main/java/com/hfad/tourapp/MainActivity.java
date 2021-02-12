@@ -10,6 +10,8 @@ import android.content.SharedPreferences;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +32,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
+import java.io.IOException;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mapView;
     private TextView txtCurrentCity;
@@ -38,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private final int LOCATION_REQUEST_CODE = 123;
+    private Geocoder geocoder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set initial text for the current city indicator
         txtCurrentCity.setText(R.string.current_city_loading);
 
+        // Set the Geocoder
+        geocoder = new Geocoder(this);
+
         // Location callback for tracking user's location
         locationCallback = new LocationCallback() {
             @Override
@@ -67,8 +76,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
-                    txtCurrentCity.setText("Location: " + String.valueOf(location.getLatitude())
-                            + " " + String.valueOf(location.getLongitude()));
+                    double lat = location.getLatitude();
+                    double lng = location.getLongitude();
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+                        if (addresses.size() > 0) {
+                            Address address = addresses.get(0);
+                            txtCurrentCity.setText("Current city: " + address.getLocality() + ", "
+                                + address.getAdminArea());
+                        }
+                    } catch (IOException e) {
+
+                    }
                 }
             }
         };
