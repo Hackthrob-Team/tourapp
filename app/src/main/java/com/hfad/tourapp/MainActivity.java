@@ -5,9 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -40,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /*
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.i("MainActivity", "Inside onOptionsItemSelected");
         switch (item.getItemId()) {
             case R.id.settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    */
 
     @Override
     protected void onStart() {
@@ -92,5 +97,14 @@ public class MainActivity extends AppCompatActivity {
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    public void onSettingsAction(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.settings_button:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+        }
     }
 }
