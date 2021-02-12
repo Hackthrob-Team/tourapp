@@ -6,7 +6,6 @@
         android:icon="@drawable/ic_settings"
         app:showAsAction="ifRoom"
         android:title="Settings"
-        android:onClick="onSettingsAction"
         />
 
 </menu>
