@@ -42,21 +42,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    /*
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.i("MainActivity", "Inside onOptionsItemSelected");
-        switch (item.getItemId()) {
-            case R.id.settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-    */
-
     @Override
     protected void onStart() {
         super.onStart();
