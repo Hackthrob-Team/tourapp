@@ -163,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         gMap = googleMap;
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -196,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     + address.getAdminArea());
                             if (gMap != null)
                                 gMap.moveCamera(CameraUpdateFactory.
-                                        newLatLngZoom(new LatLng(lat, lng), 17));
+                                        newLatLngZoom(new LatLng(lat, lng), gMap.getCameraPosition().zoom));
                         }
                     } catch (IOException e) {
                     }
