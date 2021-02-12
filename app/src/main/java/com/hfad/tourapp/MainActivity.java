@@ -3,7 +3,9 @@ package com.hfad.tourapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,11 +20,16 @@ import com.google.android.gms.maps.MapView;
 public class MainActivity extends AppCompatActivity {
     private MapView mapView;
     private TextView txtCurrentCity;
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor prefEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        prefs = getPreferences(Context.MODE_PRIVATE);
+        setDefaultPrefs();
 
         // Get the MapView and initialize the instance variable
         mapView = (MapView) findViewById(R.id.mapView);
@@ -91,5 +98,13 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
         }
+    }
+
+    public void setDefaultPrefs() {
+        prefEditor = prefs.edit();
+        prefEditor.putBoolean("text-to-speech", true);
+        prefEditor.putBoolean("notify", true);
+        prefEditor.putBoolean("dark-mode", false);
+        prefEditor.apply();
     }
 }
