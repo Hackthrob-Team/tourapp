@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swNotify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/swTTS"
+        android:layout_marginTop="5dp"
+        android:checked="true"
+        android:text="Notifications" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swDarkMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/swUnits"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        android:text="Dark Mode" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swTTS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="Text-to-Speech (TTS)" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swUnits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/swNotify"
+        android:layout_marginTop="5dp"
+        android:checked="true"
+        android:text="Miles (mi)" />
+</RelativeLayout>
