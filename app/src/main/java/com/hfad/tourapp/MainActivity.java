@@ -23,6 +23,13 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -31,6 +38,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SharedPreferences.Editor prefEditor;
     private final int LOCATION_REQUEST_CODE = 123;
     private Geocoder geocoder;
+    private String cityName;
+    private String stateName;
+    public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +87,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         == PackageManager.PERMISSION_GRANTED) {
             setUpLocationRequests();
         }
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, String.format("%s%s,%s", WIKIPEDIA_BASE_URL, cityName, stateName), null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String text = response.getJSONObject("query").getJSONArray("pages").getJSONObject(1).getJSONObject("extract").toString();
+                            Log.i("MainActivity", text);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("MainActivity", "Error");
+            }
+        });
+
+        queue.add(jsonObjectRequest);
     }
 
     //Initialize ActionBar for MainActivity
@@ -187,6 +223,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Address address = addresses.get(0);
                             txtCurrentCity.setText("Current city: " + address.getLocality() + ", "
                                     + address.getAdminArea());
+                            cityName = address.getLocality();
+                            stateName = address.getAdminArea();
                         }
                     } catch (IOException e) {
 
