@@ -40,8 +40,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView txtCurrentCity;
     private SharedPreferences prefs;
     private SharedPreferences.Editor prefEditor;
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationCallback locationCallback;
     private final int LOCATION_REQUEST_CODE = 123;
     private Geocoder geocoder;
 
@@ -68,29 +66,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set the Geocoder
         geocoder = new Geocoder(this);
 
-        // Location callback for tracking user's location
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    double lat = location.getLatitude();
-                    double lng = location.getLongitude();
-                    try {
-                        List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
-                        if (addresses.size() > 0) {
-                            Address address = addresses.get(0);
-                            txtCurrentCity.setText("Current city: " + address.getLocality() + ", "
-                                + address.getAdminArea());
-                        }
-                    } catch (IOException e) {
-
-                    }
-                }
-            }
-        };
+        // Check to see if permission is granted from previous runs
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+            setUpLocationRequests();
+        }
     }
 
     //Initialize ActionBar for MainActivity
@@ -162,8 +144,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(
-                this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -181,16 +161,45 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (requestCode == LOCATION_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED ||
                 grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                LocationRequest locationRequest = LocationRequest.create()
-                        .setInterval(1000)
-                        .setFastestInterval(500)
-                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                fusedLocationClient.requestLocationUpdates(locationRequest,
-                        locationCallback,
-                        Looper.getMainLooper());
+                setUpLocationRequests();
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
+    @SuppressLint("MissingPermission")
+    private void setUpLocationRequests() {
+        // Location callback for tracking user's location
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    double lat = location.getLatitude();
+                    double lng = location.getLongitude();
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+                        if (addresses.size() > 0) {
+                            Address address = addresses.get(0);
+                            txtCurrentCity.setText("Current city: " + address.getLocality() + ", "
+                                    + address.getAdminArea());
+                        }
+                    } catch (IOException e) {
+
+                    }
+                }
+            }
+        };
+        LocationRequest locationRequest = LocationRequest.create()
+                .setInterval(1000)
+                .setFastestInterval(500)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(
+                this);
+        fusedLocationClient.requestLocationUpdates(locationRequest,
+                locationCallback,
+                Looper.getMainLooper());
     }
 }
