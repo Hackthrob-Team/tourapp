@@ -4,22 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
-        tools:layout_editor_absoluteX="200dp"
-        tools:layout_editor_absoluteY="10dp" />
+        android:layout_height="495dp"
+        android:apiKey="AIzaSyB1xQvSYUeWZdhtsiiEp6APjWDgiTl9d1o"
+        tools:layout_editor_absoluteX="17dp"
+        tools:layout_editor_absoluteY="17dp" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/txtCurrentCity"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:textAlignment="center"
-        tools:text="CITY NAME" />
-
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:textSize="24sp" />
 </LinearLayout>
