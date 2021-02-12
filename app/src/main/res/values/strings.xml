@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">tourapp</string>
+    <string name="current_city_loading">Current city: Getting location...</string>
 </resources>
