@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        prefs = getPreferences(Context.MODE_PRIVATE);
+        prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
         setDefaultPrefs();
 
         // Get the MapView and initialize the instance variable
@@ -137,8 +137,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Sets the default preferences for the application
     public void setDefaultPrefs() {
         prefEditor = prefs.edit();
+        prefEditor.putBoolean("minimal", false);
         prefEditor.putBoolean("text-to-speech", true);
         prefEditor.putBoolean("notify", true);
         prefEditor.putBoolean("dark-mode", false);
