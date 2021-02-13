@@ -15,12 +15,12 @@ import androidx.appcompat.widget.SwitchCompat;
 
 public class SettingsActivity extends AppCompatActivity {
     public static final String TAG = "SettingsActivity";
-    SwitchCompat swSummary; //Will only the location be announced or a summary from Wikipedia?
-    SwitchCompat swTTS; //Will the service do TTS announcement or just show current city?
-    SwitchCompat swNotify;  //Will notifications to announce when entering city be used?
-    SwitchCompat swDarkMode;    //Will dark mode be enabled?
-    SharedPreferences prefs;
-    SharedPreferences.Editor prefEditor;
+    private SwitchCompat swSummary; //Will only the location be announced or a summary from Wikipedia?
+    private SwitchCompat swTTS; //Will the service do TTS announcement or just show current city?
+    private SwitchCompat swNotify;  //Will notifications to announce when entering city be used?
+    private SwitchCompat swDarkMode;    //Will dark mode be enabled?
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor prefEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Log.i(TAG, "swTTS listener");
                 prefEditor = prefs.edit();
-                prefEditor.putBoolean("minimal", isChecked);
+                prefEditor.putBoolean("summary", isChecked);
                 prefEditor.apply();
             }
         });
