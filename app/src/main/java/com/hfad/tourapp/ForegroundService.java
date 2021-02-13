@@ -51,6 +51,7 @@ public class ForegroundService extends Service {
     private Context context;
     private Geocoder geocoder;
     private String cityName;
+    private SharedPreferences prefs;
     private String prevCityName;
     private String stateName;
     private RequestQueue queue;
@@ -162,10 +163,15 @@ public class ForegroundService extends Service {
                             if (prevCityName != null && cityName != null && !cityName.equals(prevCityName)) {
                                 Log.i("REQUEST", "In request loop");
                                 String countryCode = address.getCountryCode();
-                                if (countryCode.equals("US"))
-                                    queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
-                                else
-                                    queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
+//                                if (prefs.getBoolean("summary", false))
+//                                    MainActivity.tts.speak("Welcome to " + cityName + ", " + stateName,
+//                                            TextToSpeech.QUEUE_FLUSH, null);
+//                                else {
+                                    if (countryCode.equals("US"))
+                                        queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
+                                    else
+                                        queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
+//                                }
 
                                 // Change notification
                                 builder.setContentText(cityName + ", " + stateName);

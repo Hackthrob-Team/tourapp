@@ -31,7 +31,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -56,7 +55,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, ServiceCallbacks {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mapView;
     private GoogleMap gMap;
     private TextView txtCurrentCity;
@@ -224,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Sets the default preferences for the application
     public void setDefaultPrefs() {
-        Log.i("DEFAULT", "In default  rn");
         prefEditor = prefs.edit();
         prefEditor.putBoolean("summary", false);
         prefEditor.putBoolean("text-to-speech", true);
