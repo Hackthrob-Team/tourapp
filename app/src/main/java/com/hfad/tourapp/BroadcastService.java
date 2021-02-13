@@ -133,7 +133,11 @@ public class BroadcastService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i("DESTROYSERVICE", "DESTROYSERVICE");
+
+        if (tts != null){
+            tts.stop();
+            tts.shutdown();
+        }
     }
 
     public void setCallbacks(ServiceCallbacks callbacks){

@@ -162,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (tts != null){
             tts.stop();
-            tts.shutdown();
         }
 
         if (bound) {
@@ -178,9 +177,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.onDestroy();
 
         if (tts != null){
-            tts.stop();
             tts.shutdown();
         }
+
+        Intent serviceIntent = new Intent(this, BroadcastService.class);
+        stopService(serviceIntent);
     }
 
     @Override
