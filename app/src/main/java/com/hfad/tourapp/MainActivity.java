@@ -23,6 +23,14 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -34,7 +42,13 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -45,6 +59,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SharedPreferences.Editor prefEditor;
     private final int LOCATION_REQUEST_CODE = 123;
     private Geocoder geocoder;
+    private Context context = this;
+    private String cityName;
+    private String prevCityName;
+    private String stateName;
+    private RequestQueue queue;
+    public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Set the Geocoder
         geocoder = new Geocoder(this);
+
+        // Set up Volley
+        queue = Volley.newRequestQueue(context);
 
         // Check to see if permission is granted from previous runs
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -159,10 +182,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST_CODE);
         }
 
-        googleMap.setMyLocationEnabled(true);
         gMap = googleMap;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -193,11 +216,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Address address = addresses.get(0);
                             txtCurrentCity.setText("Current city: " + address.getLocality() + ", "
                                     + address.getAdminArea());
+                            cityName = address.getLocality();
+                            stateName = address.getAdminArea();
+
+                            if ((prevCityName == null) || (prevCityName != null &&
+                                    !cityName.equals(prevCityName))) {
+                                queue.add(makeRequest(cityName, stateName));
+                            }
+                            prevCityName = cityName;
                             if (gMap != null)
                                 gMap.moveCamera(CameraUpdateFactory.
                                         newLatLngZoom(new LatLng(lat, lng), gMap.getCameraPosition().zoom));
                         }
                     } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -211,5 +243,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationClient.requestLocationUpdates(locationRequest,
                 locationCallback,
                 Looper.getMainLooper());
+    }
+
+    private JsonObjectRequest makeRequest(String city, String state) {
+        // Code to make a city request
+        return new JsonObjectRequest(Request.Method.GET, String.format("%s%s, %s", WIKIPEDIA_BASE_URL, city, state), null,
+                response -> {
+                    try {
+                        JSONObject pages = response.getJSONObject("query")
+                                .getJSONObject("pages");
+                        String pageId = pages.names().getString(0);
+                        String text = pages.getJSONObject(pageId).getString("extract");
+
+                        Log.i("ExtractText", text);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }, error -> Log.e("ExtractText", "Error"));
     }
 }
