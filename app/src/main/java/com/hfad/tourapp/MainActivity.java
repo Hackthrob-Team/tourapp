@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String prevCityName;
     private String stateName;
     private RequestQueue queue;
-    private Intent serviceIntent = new Intent(this, BroadcastService.class);
+    private final Intent serviceIntent = new Intent(this, BroadcastService.class);
     public TextToSpeech tts;
     public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
 
@@ -131,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onResume() {
+        Log.i("RESUMING", "Resuming rn");
         super.onResume();
         mapView.onResume();
         stopService(serviceIntent);
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onPause() {
+        Log.i("PAUSE", "Pausing rn");
         super.onPause();
         mapView.onPause();
         startService(serviceIntent);

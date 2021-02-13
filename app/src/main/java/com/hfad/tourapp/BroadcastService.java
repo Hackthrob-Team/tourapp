@@ -17,8 +17,6 @@ public class BroadcastService extends Service {
     private NotificationManager nMN;
     private NotificationChannel notificationChannel;
     private Notification notification;
-    public BroadcastService() {
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -28,6 +26,7 @@ public class BroadcastService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("BROADCAST", "onStartCommand");
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
@@ -49,10 +48,11 @@ public class BroadcastService extends Service {
                 .setContentIntent(pendingIntent);
 
         notification = builder.build();
+        Log.i("BROADCAST", "Before startForeground");
         startForeground(1, notification);
         Log.i("FOREGROUND", "In fore");
         //do heavy work on a background thread
-        //stopSelf();
+        stopSelf();
         return START_NOT_STICKY;
     }
 
