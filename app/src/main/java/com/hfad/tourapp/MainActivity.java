@@ -276,15 +276,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             if ((prevCityName == null && cityName != null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
-//                                if (prefs.getBoolean("summary", false))
-//                                    tts.speak("Welcome to " + cityName + ", " + stateName,
-//                                            TextToSpeech.QUEUE_FLUSH, null);
-//                                else {
+                                if (prefs.getBoolean("summary", false))
+                                    tts.speak("Welcome to " + cityName + ", " + stateName,
+                                            TextToSpeech.QUEUE_FLUSH, null);
+                                else {
                                     if (countryCode.equals("US"))
                                         queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
                                     else
                                         queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
-//                                }
+                                }
                             }
                             prevCityName = cityName;
                             if (gMap != null)
