@@ -1,22 +1,10 @@
 package com.hfad.tourapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.OnLifecycleEvent;
-import androidx.lifecycle.ProcessLifecycleOwner;
-
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -24,14 +12,17 @@ import android.location.Location;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.os.Looper;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -54,6 +45,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mapView;
@@ -61,19 +53,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView txtCurrentCity;
     private SharedPreferences prefs;
     private MediaPlayer mediaPlayer;
-    private SharedPreferences.Editor prefEditor;
     private final int LOCATION_REQUEST_CODE = 123;
     private Geocoder geocoder;
-    private Context context = this;
+    private final Context context = this;
     private String cityName;
     private String prevCityName;
     private String stateName;
     private RequestQueue queue;
     public static TextToSpeech tts;
     public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
-
-    private ForegroundService broadcastService;
-    private boolean bound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,14 +93,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setDefaultPrefs();
 
         // Get the MapView and initialize the instance variable
-        mapView = (MapView) findViewById(R.id.mapView);
+        mapView = findViewById(R.id.mapView);
         // Call the callback with the mapView
         mapView.onCreate(savedInstanceState);
 
         // Look for a callback when the map is ready inside this class
         mapView.getMapAsync(this);
 
-        txtCurrentCity = (TextView) findViewById(R.id.txtCurrentCity);
+        txtCurrentCity = findViewById(R.id.txtCurrentCity);
         // Set initial text for the current city indicator
         txtCurrentCity.setText(R.string.current_city_loading);
 
@@ -206,17 +194,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onSettingsAction(MenuItem item) {
-        switch (item.getItemId())
-        {
-            case R.id.settings_button:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+        if (item.getItemId() == R.id.settings_button) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         }
     }
 
     //Sets the default preferences for the application
     public void setDefaultPrefs() {
-        prefEditor = prefs.edit();
+        SharedPreferences.Editor prefEditor = prefs.edit();
         prefEditor.putBoolean("summary", false);
         prefEditor.putBoolean("text-to-speech", true);
         prefEditor.putBoolean("notify", true);
@@ -268,8 +254,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
                         if (addresses.size() > 0) {
                             Address address = addresses.get(0);
-                            txtCurrentCity.setText("Current city: " + address.getLocality() + ", "
-                                    + address.getAdminArea());
+                            txtCurrentCity.setText(getResources()
+                                    .getString(R.string.current_city_textview,
+                                            address.getLocality(), address.getAdminArea()));
                             cityName = address.getLocality();
                             stateName = address.getAdminArea();
 
@@ -281,9 +268,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                             TextToSpeech.QUEUE_FLUSH, null);
                                 else {
                                     if (countryCode.equals("US"))
-                                        queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
+                                        queue.add(makeRequest(cityName, stateName));
                                     else
-                                        queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
+                                        queue.add(makeRequest(cityName, address.getCountryName()));
                                 }
                             }
                             prevCityName = cityName;
@@ -293,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } catch (NullPointerException e) {
+                    } catch (NullPointerException ignored) {
 
                     }
                 }
@@ -310,14 +297,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Looper.getMainLooper());
     }
 
-    private JsonObjectRequest makeRequest(String city, String state, String formatString) {
+    private JsonObjectRequest makeRequest(String city, String state) {
         // Code to make a city request
-        return new JsonObjectRequest(Request.Method.GET, String.format(formatString, WIKIPEDIA_BASE_URL, city, state), null,
+        return new JsonObjectRequest(Request.Method.GET, String.format("%s%s, %s", WIKIPEDIA_BASE_URL, city, state), null,
                 response -> {
                     try {
                         JSONObject pages = response.getJSONObject("query")
                                 .getJSONObject("pages");
-                        String pageId = pages.names().getString(0);
+                        String pageId = Objects.requireNonNull(pages.names()).getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
                         if(!MainActivity.tts.isSpeaking()) {

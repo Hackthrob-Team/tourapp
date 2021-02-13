@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Tour Application</string>
     <string name="current_city_loading">Current city: Getting location...</string>
+    <string name="current_city_textview">Current city: %1$s, %2$s</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Preference Titles -->
