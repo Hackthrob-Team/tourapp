@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 
 import androidx.annotation.NonNull;
@@ -15,10 +17,11 @@ import androidx.appcompat.widget.SwitchCompat;
 
 public class SettingsActivity extends AppCompatActivity {
     public static final String TAG = "SettingsActivity";
-    private SwitchCompat swSummary; //Will only the location be announced or a summary from Wikipedia?
-    private SwitchCompat swTTS; //Will the service do TTS announcement or just show current city?
+    private SwitchCompat swWelcome; //Will only the location be announced or a summary from Wikipedia?
     private SwitchCompat swNotify;  //Will notifications to announce when entering city be used?
-    private SwitchCompat swDarkMode;    //Will dark mode be enabled?
+    private SwitchCompat swSpeechLimit;    //Will dark mode be enabled?
+    private SeekBar sbWords;    //Regulates the words to limit to
+    private TextView tvWordCount;
     private SharedPreferences prefs;
     private SharedPreferences.Editor prefEditor;
 
@@ -32,39 +35,29 @@ public class SettingsActivity extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
 
         //Initializing each of the switches
-        swSummary = findViewById(R.id.swSummary);
-        swTTS = findViewById(R.id.swTTS);
+        swWelcome = findViewById(R.id.swWelcome);
         swNotify = findViewById(R.id.swNotify);
-        swDarkMode = findViewById(R.id.swDarkMode);
+        swSpeechLimit = findViewById(R.id.swSpeechLimit);
+        sbWords = findViewById(R.id.sbWords);
+        tvWordCount = findViewById(R.id.tvWordCount);
         prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
 
-        if(prefs.getBoolean("summary", false))
-            swSummary.setChecked(true);
-        if(prefs.getBoolean("text-to-speech", false))
-            swTTS.setChecked(true);
+        if(prefs.getBoolean("welcome", false))
+            swWelcome.setChecked(true);
         if(prefs.getBoolean("notify", false))
             swNotify.setChecked(true);
-        if(prefs.getBoolean("dark-mode", false))
-            swDarkMode.setChecked(true);
+        if(prefs.getBoolean("speech-limit", false))
+            swSpeechLimit.setChecked(true);
+
+        tvWordCount.setText(sbWords.getProgress() + " words");
 
         //Setting up listeners for switches
 
-        swSummary.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        swWelcome.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.i(TAG, "swSummary listener");
                 prefEditor = prefs.edit();
-                prefEditor.putBoolean("summary", isChecked);
-                prefEditor.apply();
-            }
-        });
-
-        swTTS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.i(TAG, "swTTS listener");
-                prefEditor = prefs.edit();
-                prefEditor.putBoolean("text-to-speech", isChecked);
+                prefEditor.putBoolean("welcome", isChecked);
                 prefEditor.apply();
             }
         });
@@ -72,21 +65,34 @@ public class SettingsActivity extends AppCompatActivity {
         swNotify.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.i(TAG, "swNotify listener");
                 prefEditor = prefs.edit();
                 prefEditor.putBoolean("notify", isChecked);
                 prefEditor.apply();
             }
         });
 
-        swDarkMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        swSpeechLimit.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.i(TAG, "swDarkMode listener");
                 prefEditor = prefs.edit();
-                prefEditor.putBoolean("dark-mode", isChecked);
+                prefEditor.putBoolean("speech-limit", isChecked);
                 prefEditor.apply();
             }
+        });
+
+        sbWords.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                prefEditor = prefs.edit();
+                tvWordCount.setText(sbWords.getProgress() + " words");
+                prefEditor.putInt("word-count", sbWords.getProgress());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 
