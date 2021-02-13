@@ -140,6 +140,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         Log.i("RESUMING", "Resuming rn");
+        if(prefs.getBoolean("summary", false))
+            Log.i("RESUMING", "Summary: true");
+        if(prefs.getBoolean("text-to-speech", false))
+            Log.i("RESUMING", "TTS: true");
+        if(prefs.getBoolean("notify", false))
+            Log.i("RESUMING", "Notify: true");
+        if(prefs.getBoolean("dark-mode", false))
+            Log.i("RESUMING", "DarkMode: true");
         super.onResume();
         mapView.onResume();
         Intent serviceIntent = new Intent(this, BroadcastService.class);
@@ -207,8 +215,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Sets the default preferences for the application
     public void setDefaultPrefs() {
+        Log.i("DEFAULT", "In default  rn");
         prefEditor = prefs.edit();
-        prefEditor.putBoolean("minimal", false);
+        prefEditor.putBoolean("summary", false);
         prefEditor.putBoolean("text-to-speech", true);
         prefEditor.putBoolean("notify", true);
         prefEditor.putBoolean("dark-mode", false);

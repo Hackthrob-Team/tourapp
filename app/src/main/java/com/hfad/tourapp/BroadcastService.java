@@ -95,7 +95,7 @@ public class BroadcastService extends Service {
         }
 
         builder = new NotificationCompat.Builder(this, "4567")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_app_foreground)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setContentTitle(getText(R.string.notification_title))

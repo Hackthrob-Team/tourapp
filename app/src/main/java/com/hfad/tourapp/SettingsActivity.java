@@ -52,9 +52,9 @@ public class SettingsActivity extends AppCompatActivity {
         swSummary.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.i(TAG, "swTTS listener");
+                Log.i(TAG, "swSummary listener");
                 prefEditor = prefs.edit();
-                prefEditor.putBoolean("minimal", isChecked);
+                prefEditor.putBoolean("summary", isChecked);
                 prefEditor.apply();
             }
         });
