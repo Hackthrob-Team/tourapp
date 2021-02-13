@@ -7,21 +7,35 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+
 
 public class BroadcastService extends Service {
     private NotificationManager nMN;
     private NotificationChannel notificationChannel;
     private Notification notification;
 
+    private final IBinder binder = new LocalBinder();
+    private ServiceCallbacks serviceCallbacks;
+
+    // class used for the client binder
+    public class LocalBinder extends Binder {
+        BroadcastService getService() {
+            return BroadcastService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        //throw new UnsupportedOperationException("Not yet implemented");
+        return binder;
     }
 
     @Override
@@ -30,6 +44,8 @@ public class BroadcastService extends Service {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
+
+        serviceCallbacks.doSomething();
 
         nMN = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -56,5 +72,7 @@ public class BroadcastService extends Service {
         return START_NOT_STICKY;
     }
 
-
+    public void setCallbacks(ServiceCallbacks callbacks){
+        serviceCallbacks = callbacks;
+    }
 }

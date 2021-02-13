@@ -9,8 +9,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -20,6 +22,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
@@ -59,7 +62,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, ServiceCallbacks {
     private MapView mapView;
     private GoogleMap gMap;
     private TextView txtCurrentCity;
@@ -74,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private RequestQueue queue;
     public TextToSpeech tts;
     public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
+
+    private BroadcastService broadcastService;
+    private boolean bound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +132,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStart() {
         super.onStart();
         mapView.onStart();
+
+        Intent intent = new Intent(this, BroadcastService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -154,6 +163,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (tts != null){
             tts.stop();
             tts.shutdown();
+        }
+
+        if (bound) {
+            broadcastService.setCallbacks(null); // unregister
+            unbindService(serviceConnection);
+            bound = false;
         }
     }
 
@@ -228,11 +243,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @SuppressLint("MissingPermission")
-    private void setUpLocationRequests() {
+    public void setUpLocationRequests() {
+        Log.d("Hi2", "here2");
         // Location callback for tracking user's location
         LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
+                Log.d("Hi3","here3");
                 if (locationResult == null) {
                     return;
                 }
@@ -247,10 +264,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     + address.getAdminArea());
                             cityName = address.getLocality();
                             stateName = address.getAdminArea();
+                            Log.d("Hi4","here4");
 
                             if ((prevCityName == null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
+                                Log.d("Hi5","here5");
                                 if (countryCode.equals("US"))
                                     queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
                                 else
@@ -291,6 +310,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (tts.isSpeaking())
                             tts.stop();
 
+                        Log.d("Hi7",text);
+
                         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
 
                         Log.i("ExtractText", text);
@@ -299,5 +320,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                 }, error -> Log.e("ExtractText", "Error"));
+    }
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // cast the IBinder and get MyService instance
+            BroadcastService.LocalBinder binder = (BroadcastService.LocalBinder) service;
+            broadcastService = binder.getService();
+            bound = true;
+            broadcastService.setCallbacks(MainActivity.this); // register
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
+
+    /* Defined by ServiceCallbacks interface */
+    @Override
+    public void doSomething() {
+        setUpLocationRequests();
+        Log.d("Hi","here");
     }
 }
