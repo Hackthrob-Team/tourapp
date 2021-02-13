@@ -264,6 +264,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (NullPointerException e) {
+
                     }
                 }
             }
