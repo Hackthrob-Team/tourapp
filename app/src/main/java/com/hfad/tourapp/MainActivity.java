@@ -261,12 +261,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @SuppressLint("MissingPermission")
     public void setUpLocationRequests() {
-        Log.d("Hi2", "here2");
         // Location callback for tracking user's location
         LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.d("Hi3","here3");
                 if (locationResult == null) {
                     return;
                 }
@@ -281,12 +279,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     + address.getAdminArea());
                             cityName = address.getLocality();
                             stateName = address.getAdminArea();
-                            Log.d("Hi4","here4");
 
                             if ((prevCityName == null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
-                                Log.d("Hi5","here5");
                                 if (countryCode.equals("US"))
                                     queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
                                 else
@@ -365,6 +361,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void doSomething() {
         setUpLocationRequests();
-        Log.d("Hi","here");
     }
 }
