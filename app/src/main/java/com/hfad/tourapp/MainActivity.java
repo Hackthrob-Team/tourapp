@@ -3,7 +3,12 @@ package com.hfad.tourapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -61,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String prevCityName;
     private String stateName;
     private RequestQueue queue;
+    private Intent serviceIntent = new Intent(this, BroadcastService.class);
     public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
 
     @Override
@@ -116,12 +123,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        stopService(serviceIntent);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mapView.onPause();
+        startService(serviceIntent);
     }
 
     @Override

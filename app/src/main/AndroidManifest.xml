@@ -4,7 +4,8 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,15 +13,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Tourapp">
-        <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB1xQvSYUeWZdhtsiiEp6APjWDgiTl9d1o"/>
+        <service
+            android:name=".BroadcastService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="location"></service>
 
-        <service android:name=".BroadcastService" android:foregroundServiceType="location"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyB1xQvSYUeWZdhtsiiEp6APjWDgiTl9d1o" />
+
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
-        </activity>
-
+            android:label="@string/title_activity_settings"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

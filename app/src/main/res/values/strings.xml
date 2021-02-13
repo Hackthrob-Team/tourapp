@@ -17,4 +17,9 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!--Notification strings-->
+    <string name="notification_title">NOTIFICATION TITLE</string>
+    <string name="notification_body">NOTIFICATION BODY</string>
+    <string name="notification_ticker">NOTIFICATION TICKER</string>
 </resources>
