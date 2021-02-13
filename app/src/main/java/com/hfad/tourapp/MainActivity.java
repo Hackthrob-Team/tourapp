@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onResume();
         mapView.onResume();
         Intent serviceIntent = new Intent(this, BroadcastService.class);
-        context.stopService(serviceIntent);
+        stopService(serviceIntent);
     }
 
     @Override
