@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Set up TextToSpeech
         tts = new TextToSpeech(this, status -> {});
-
         tts.setLanguage(Locale.US);
 
         // Check to see if permission is granted from previous runs
@@ -139,6 +138,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStop() {
         super.onStop();
         mapView.onStop();
+
+        if (tts != null){
+            tts.stop();
+            tts.shutdown();
+        }
     }
 
     @Override
@@ -146,7 +150,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onDestroy();
         mapView.onDestroy();
 
-        tts.stop();
+        if (tts != null){
+            tts.stop();
+            tts.shutdown();
+        }
     }
 
     @Override
