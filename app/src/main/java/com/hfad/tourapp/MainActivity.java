@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Sets the default preferences for the application
     public void setDefaultPrefs() {
         prefEditor = prefs.edit();
-        prefEditor.putBoolean("minimal", false);
+        prefEditor.putBoolean("summary", true);
         prefEditor.putBoolean("text-to-speech", true);
         prefEditor.putBoolean("notify", true);
         prefEditor.putBoolean("dark-mode", false);

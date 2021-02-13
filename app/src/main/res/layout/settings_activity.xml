@@ -13,7 +13,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:checked="false"
-        android:text="Notifications" />
+        android:text="New City Alerts" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/swDarkMode"
@@ -31,7 +31,7 @@
         android:id="@+id/swTTS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/swMinimal"
+        android:layout_below="@+id/swSummary"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="20dp"
@@ -42,7 +42,7 @@
         android:textColorLink="#000000" />
 
     <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/swMinimal"
+        android:id="@+id/swSummary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -51,6 +51,6 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:checked="false"
-        android:text="Minimal Mode (no summaries)" />
+        android:text="City Summaries" />
 
 </RelativeLayout>
