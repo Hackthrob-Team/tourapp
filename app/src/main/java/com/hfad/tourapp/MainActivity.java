@@ -14,6 +14,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mapView;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String prevCityName;
     private String stateName;
     private RequestQueue queue;
+    public TextToSpeech tts;
     public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
 
     @Override
@@ -91,6 +94,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Set up Volley
         queue = Volley.newRequestQueue(context);
+
+        // Set up TextToSpeech
+        tts = new TextToSpeech(this, status -> {});
+
+        tts.setLanguage(Locale.US);
 
         // Check to see if permission is granted from previous runs
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -137,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+
+        tts.stop();
     }
 
     @Override
@@ -254,6 +264,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .getJSONObject("pages");
                         String pageId = pages.names().getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
+
+                        if (tts.isSpeaking())
+                            tts.stop();
+
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
 
                         Log.i("ExtractText", text);
                     } catch (JSONException e) {
