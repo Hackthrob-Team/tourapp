@@ -156,15 +156,15 @@ public class ForegroundService extends Service {
                             if ((prevCityName == null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
-                                if (prefs.getBoolean("summary", false))
-                                    MainActivity.tts.speak("Welcome to " + cityName + ", " + stateName,
-                                            TextToSpeech.QUEUE_FLUSH, null);
-                                else {
+//                                if (prefs.getBoolean("summary", false))
+//                                    MainActivity.tts.speak("Welcome to " + cityName + ", " + stateName,
+//                                            TextToSpeech.QUEUE_FLUSH, null);
+//                                else {
                                     if (countryCode.equals("US"))
                                         queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
                                     else
                                         queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
-                                }
+//                                }
 
                                 // Change notification
                                 builder.setContentText(cityName + ", " + stateName);
