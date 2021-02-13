@@ -80,30 +80,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ProcessLifecycleOwner.get().getLifecycle().addObserver(new LifecycleObserver() {
-            @OnLifecycleEvent(Lifecycle.Event.ON_START)
-            void startForegroundTasks() {
-                Log.i("FOREGROUND", "In fore");
-            }
-
-            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-            void startBackgroundTasks() {
-                Log.i("FOREGROUND", "Out fore");
-                /*
-                if (tts != null){
-                    tts.stop();
-                }
-                 */
-
-                if (bound) {
-                    broadcastService.setCallbacks(null); // unregister
-                    unbindService(serviceConnection);
-                    bound = false;
-                }
-                Intent serviceIntent = new Intent(MainActivity.this, ForegroundService.class);
-                context.startService(serviceIntent);
-            }
-        });
+//        ProcessLifecycleOwner.get().getLifecycle().addObserver(new LifecycleObserver() {
+//            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+//            void startForegroundTasks() {
+//                Log.i("FOREGROUND", "In fore");
+//            }
+//
+//            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+//            void startBackgroundTasks() {
+//                Log.i("FOREGROUND", "Out fore");
+//                /*
+//                if (tts != null){
+//                    tts.stop();
+//                }
+//                 */
+//
+//                Intent serviceIntent = new Intent(MainActivity.this, ForegroundService.class);
+//                context.startService(serviceIntent);
+//            }
+//        });
 
         prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
@@ -166,25 +161,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onPause() {
         super.onPause();
         mapView.onPause();
-        /*
+
         if (!isFinishing()) {
             Intent serviceIntent = new Intent(this, ForegroundService.class);
             context.startService(serviceIntent);
         }
-         */
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         mapView.onStop();
-        /*
+
         if (isFinishing()) {
             if (tts != null) {
                 tts.stop();
             }
         }
-         */
     }
 
     @Override
@@ -338,28 +331,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                 }, error -> Log.e("ExtractText", "Error"));
-    }
-
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // cast the IBinder and get MyService instance
-            ForegroundService.LocalBinder binder = (ForegroundService.LocalBinder) service;
-            broadcastService = binder.getService();
-            bound = true;
-            broadcastService.setCallbacks(MainActivity.this); // register
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            bound = false;
-        }
-    };
-
-    /* Defined by ServiceCallbacks interface */
-    @Override
-    public void doSomething() {
-        setUpLocationRequests();
     }
 }

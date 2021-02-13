@@ -55,8 +55,6 @@ public class ForegroundService extends Service {
     private String prevCityName;
     private String stateName;
     private RequestQueue queue;
-    private TextToSpeech tts;
-    private SharedPreferences prefs;
     private MediaPlayer mediaPlayer;
     private final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
     private final String CHANNEL_ID = "4567";
