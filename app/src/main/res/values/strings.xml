@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">tourapp</string>
+    <string name="app_name">Tour Application</string>
     <string name="current_city_loading">Current city: Getting location...</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">Settings</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap gMap;
     private TextView txtCurrentCity;
     private SharedPreferences prefs;
+    private MediaPlayer mediaPlayer;
     private SharedPreferences.Editor prefEditor;
     private final int LOCATION_REQUEST_CODE = 123;
     private Geocoder geocoder;
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
+        mediaPlayer = MediaPlayer.create(this, R.raw.notification);
         setDefaultPrefs();
 
         // Get the MapView and initialize the instance variable
@@ -322,7 +325,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         Log.d("Hi7",text);
 
-                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                        mediaPlayer.start();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH,null);
+                        }
+                        else{
+                            tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
+                        }
+
+                        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
 
                         Log.i("ExtractText", text);
                     } catch (JSONException e) {

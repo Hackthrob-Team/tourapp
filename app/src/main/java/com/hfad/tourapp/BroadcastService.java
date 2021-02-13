@@ -9,10 +9,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -55,6 +57,8 @@ public class BroadcastService extends Service {
     private String stateName;
     private RequestQueue queue;
     private TextToSpeech tts;
+    private SharedPreferences prefs;
+    private MediaPlayer mediaPlayer;
     private final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
     private final String CHANNEL_ID = "4567";
     private final int NOTIFICATION_ID = 2;
@@ -84,6 +88,9 @@ public class BroadcastService extends Service {
                 0, notificationIntent, 0);
 
         serviceCallbacks.doSomething();
+
+        prefs = getSharedPreferences("com.hfad.tourapp.preferences", MODE_PRIVATE);
+        mediaPlayer = MediaPlayer.create(this,R.raw.notification);
 
         nMN = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -216,7 +223,15 @@ public class BroadcastService extends Service {
 
                         Log.d("Hi7",text);
 
-                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                        mediaPlayer.start();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH,null);
+                        }
+                        else{
+                            tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
+                        }
+
+                        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
 
                         Log.i("ExtractText", text);
                     } catch (JSONException e) {
