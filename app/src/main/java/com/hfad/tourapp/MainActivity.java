@@ -102,6 +102,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
             void startBackgroundTasks() {
                 Log.i("FOREGROUND", "Out fore");
+                if (tts != null){
+                    tts.stop();
+                }
+
+                if (bound) {
+                    broadcastService.setCallbacks(null); // unregister
+                    unbindService(serviceConnection);
+                    bound = false;
+                }
                 Intent serviceIntent = new Intent(MainActivity.this, BroadcastService.class);
                 context.startService(serviceIntent);
             }
@@ -182,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onStop();
         mapView.onStop();
 
+        /*
         if (tts != null){
             tts.stop();
         }
@@ -191,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             unbindService(serviceConnection);
             bound = false;
         }
+         */
     }
 
     @Override
