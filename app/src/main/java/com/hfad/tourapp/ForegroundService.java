@@ -153,7 +153,7 @@ public class ForegroundService extends Service {
                             cityName = address.getLocality();
                             stateName = address.getAdminArea();
 
-                            if (cityName != null || (prevCityName != null &&
+                            if ((prevCityName == null && cityName != null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
 //                                if (prefs.getBoolean("summary", false))
