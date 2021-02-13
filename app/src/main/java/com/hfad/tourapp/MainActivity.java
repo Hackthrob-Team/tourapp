@@ -238,7 +238,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             if ((prevCityName == null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
-                                queue.add(makeRequest(cityName, stateName));
+                                String countryCode = address.getCountryCode();
+                                if (countryCode.equals("IN"))
+                                    queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
+                                else
+                                    queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
                             }
                             prevCityName = cityName;
                             if (gMap != null)
@@ -262,9 +266,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Looper.getMainLooper());
     }
 
-    private JsonObjectRequest makeRequest(String city, String state) {
+    private JsonObjectRequest makeRequest(String city, String state, String formatString) {
         // Code to make a city request
-        return new JsonObjectRequest(Request.Method.GET, String.format("%s%s, %s", WIKIPEDIA_BASE_URL, city, state), null,
+        return new JsonObjectRequest(Request.Method.GET, String.format(formatString, WIKIPEDIA_BASE_URL, city, state), null,
                 response -> {
                     try {
                         JSONObject pages = response.getJSONObject("query")
