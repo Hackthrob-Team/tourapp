@@ -223,7 +223,8 @@ public class BroadcastService extends Service {
 
                         Log.d("Hi7",text);
 
-                        mediaPlayer.start();
+                        if(prefs.getBoolean("notify", false))
+                            mediaPlayer.start();
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH,null);
                         }
@@ -231,7 +232,8 @@ public class BroadcastService extends Service {
                             tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
                         }
 
-                        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                        if(prefs.getBoolean("text-to-speech", false))
+                            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
 
                         Log.i("ExtractText", text);
                     } catch (JSONException e) {

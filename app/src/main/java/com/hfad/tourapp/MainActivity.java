@@ -4,6 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -88,6 +93,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(new LifecycleObserver() {
+            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+            void startForegroundTasks() {
+                Log.i("FOREGROUND", "In fore");
+            }
+
+            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+            void startBackgroundTasks() {
+                Log.i("FOREGROUND", "Out fore");
+                Intent serviceIntent = new Intent(MainActivity.this, BroadcastService.class);
+                context.startService(serviceIntent);
+            }
+        });
+
         prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
         setDefaultPrefs();
@@ -142,15 +161,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onResume() {
-        Log.i("RESUMING", "Resuming rn");
-        if(prefs.getBoolean("summary", false))
-            Log.i("RESUMING", "Summary: true");
-        if(prefs.getBoolean("text-to-speech", false))
-            Log.i("RESUMING", "TTS: true");
-        if(prefs.getBoolean("notify", false))
-            Log.i("RESUMING", "Notify: true");
-        if(prefs.getBoolean("dark-mode", false))
-            Log.i("RESUMING", "DarkMode: true");
         super.onResume();
         mapView.onResume();
         Intent serviceIntent = new Intent(this, BroadcastService.class);
@@ -159,11 +169,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onPause() {
-        Log.i("PAUSE", "Pausing rn");
         super.onPause();
         mapView.onPause();
+        /*
         Intent serviceIntent = new Intent(this, BroadcastService.class);
         context.startService(serviceIntent);
+         */
     }
 
     @Override
@@ -325,7 +336,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         Log.d("Hi7",text);
 
-                        mediaPlayer.start();
+                        if(prefs.getBoolean("notify", false))
+                            mediaPlayer.start();
+
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH,null);
                         }
@@ -333,7 +346,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
                         }
 
-                        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                        if(prefs.getBoolean("text-to-speech", false))
+                            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
 
                         Log.i("ExtractText", text);
                     } catch (JSONException e) {
