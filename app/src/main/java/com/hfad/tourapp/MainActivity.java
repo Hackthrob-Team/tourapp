@@ -239,26 +239,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private JsonObjectRequest makeRequest(String city, String state) {
         // Code to make a city request
         return new JsonObjectRequest(Request.Method.GET, String.format("%s%s, %s", WIKIPEDIA_BASE_URL, city, state), null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONObject pages = response.getJSONObject("query")
-                                    .getJSONObject("pages");
-                            String pageId = pages.names().getString(0);
-                            String text = pages.getJSONObject(pageId).getString("extract");
+                response -> {
+                    try {
+                        JSONObject pages = response.getJSONObject("query")
+                                .getJSONObject("pages");
+                        String pageId = pages.names().getString(0);
+                        String text = pages.getJSONObject(pageId).getString("extract");
 
-                            Log.i("ExtractText", text);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
+                        Log.i("ExtractText", text);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("ExtractText", "Error");
-            }
-        });
+
+                }, error -> Log.e("ExtractText", "Error"));
     }
 }
