@@ -3,7 +3,12 @@ package com.hfad.tourapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -124,14 +130,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     protected void onResume() {
+        Log.i("RESUMING", "Resuming rn");
         super.onResume();
         mapView.onResume();
+        Intent serviceIntent = new Intent(this, BroadcastService.class);
+        context.stopService(serviceIntent);
     }
 
     @Override
     protected void onPause() {
+        Log.i("PAUSE", "Pausing rn");
         super.onPause();
         mapView.onPause();
+        Intent serviceIntent = new Intent(this, BroadcastService.class);
+        context.startService(serviceIntent);
     }
 
     @Override
