@@ -90,9 +90,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
             void startBackgroundTasks() {
                 Log.i("FOREGROUND", "Out fore");
+                /*
                 if (tts != null){
                     tts.stop();
                 }
+                 */
 
                 if (bound) {
                     broadcastService.setCallbacks(null); // unregister
