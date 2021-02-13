@@ -289,8 +289,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String pageId = pages.names().getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
-                        if (!tts.isSpeaking())
-                            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                        if (MainActivity.tts.isSpeaking())
+                            MainActivity.tts.stop();
+
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
 
                     } catch (JSONException e) {
                         e.printStackTrace();

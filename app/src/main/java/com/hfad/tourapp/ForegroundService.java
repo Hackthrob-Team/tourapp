@@ -199,8 +199,10 @@ public class ForegroundService extends Service {
                         String pageId = pages.names().getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
-                        if (!MainActivity.tts.isSpeaking())
-                            MainActivity.tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                        if (MainActivity.tts.isSpeaking())
+                            MainActivity.tts.stop();
+
+                        MainActivity.tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
