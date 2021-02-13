@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -203,10 +205,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Sets the default preferences for the application
     public void setDefaultPrefs() {
         SharedPreferences.Editor prefEditor = prefs.edit();
-        prefEditor.putBoolean("summary", false);
-        prefEditor.putBoolean("text-to-speech", true);
+        prefEditor.putBoolean("welcome", true);
         prefEditor.putBoolean("notify", true);
-        prefEditor.putBoolean("dark-mode", false);
+        prefEditor.putBoolean("speech-limit", false);
+        prefEditor.putInt("word-count", 100);
         prefEditor.apply();
     }
 

@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -6,17 +7,17 @@
         android:id="@+id/swNotify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/swTTS"
+        android:layout_below="@+id/swWelcome"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="20dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:checked="false"
-        android:text="New City Alerts" />
+        android:text="Sound Effects While Entering City" />
 
     <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/swDarkMode"
+        android:id="@+id/swSpeechLimit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/swNotify"
@@ -25,24 +26,10 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
-        android:text="Dark Mode" />
+        android:text="Limit Narration to:" />
 
     <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/swTTS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/swSummary"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="20dp"
-        android:checked="false"
-        android:text="Text-to-Speech (TTS)"
-        android:textColorLink="#000000" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/swSummary"
+        android:id="@+id/swWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -51,6 +38,30 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:checked="false"
-        android:text="City Summaries" />
+        android:text="City Welcome Message Only" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/sbWords"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/swSpeechLimit"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="5dp"
+        android:layout_toStartOf="@+id/tvWordCount"
+        android:max="250"
+        android:progress="100" />
+
+    <TextView
+        android:id="@+id/tvWordCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/swSpeechLimit"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="20dp"
+        android:width="85dp"
+        tools:text="NUM WORDS" />
 
 </RelativeLayout>
