@@ -276,10 +276,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             if ((prevCityName == null && cityName != null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
-                                if (countryCode.equals("US"))
-                                    queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
-                                else
-                                    queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
+//                                if (prefs.getBoolean("summary", false))
+//                                    tts.speak("Welcome to " + cityName + ", " + stateName,
+//                                            TextToSpeech.QUEUE_FLUSH, null);
+//                                else {
+                                    if (countryCode.equals("US"))
+                                        queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
+                                    else
+                                        queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
+//                                }
                             }
                             prevCityName = cityName;
                             if (gMap != null)
@@ -288,6 +293,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (NullPointerException e) {
+
                     }
                 }
             }
@@ -316,6 +323,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if(!MainActivity.tts.isSpeaking()) {
                             if (prefs.getBoolean("notify", false))
                                 mediaPlayer.start();
+                            if (MainActivity.tts.isSpeaking())
+                                MainActivity.tts.stop();
+
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);

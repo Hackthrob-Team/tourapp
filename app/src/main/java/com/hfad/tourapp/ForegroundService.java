@@ -158,8 +158,8 @@ public class ForegroundService extends Service {
                             cityName = address.getLocality();
                             stateName = address.getAdminArea();
 
-                            if (prevCityName != null && cityName != null && !cityName.equals(prevCityName)) {
-                                Log.i("REQUEST", "In request loop");
+                            if ((prevCityName != null && cityName != null &&
+                                    !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
 //                                if (prefs.getBoolean("summary", false))
 //                                    MainActivity.tts.speak("Welcome to " + cityName + ", " + stateName,
@@ -199,7 +199,6 @@ public class ForegroundService extends Service {
         return new JsonObjectRequest(Request.Method.GET, String.format(formatString, WIKIPEDIA_BASE_URL, city, state), null,
                 response -> {
                     try {
-                        Log.i("REQUEST", "In try block");
                         JSONObject pages = response.getJSONObject("query")
                                 .getJSONObject("pages");
                         String pageId = pages.names().getString(0);
