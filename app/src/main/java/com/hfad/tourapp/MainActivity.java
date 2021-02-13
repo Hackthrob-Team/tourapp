@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             cityName = address.getLocality();
                             stateName = address.getAdminArea();
 
-                            if ((prevCityName == null) || (prevCityName != null &&
+                            if ((prevCityName == null && cityName != null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
                                 if (countryCode.equals("US"))
