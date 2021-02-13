@@ -46,6 +46,7 @@ import java.util.Locale;
 public class BroadcastService extends Service {
     private NotificationManager nMN;
     private NotificationChannel notificationChannel;
+    private NotificationCompat.Builder builder;
     private Notification notification;
     private Context context;
     private Geocoder geocoder;
@@ -55,6 +56,8 @@ public class BroadcastService extends Service {
     private RequestQueue queue;
     private TextToSpeech tts;
     private final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
+    private final String CHANNEL_ID = "4567";
+    private final int NOTIFICATION_ID = 2;
 
     private final IBinder binder = new LocalBinder();
     private ServiceCallbacks serviceCallbacks;
@@ -85,22 +88,22 @@ public class BroadcastService extends Service {
         nMN = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationChannel = new NotificationChannel("4567",
+            notificationChannel = new NotificationChannel(CHANNEL_ID,
                     "Tours",
                     NotificationManager.IMPORTANCE_DEFAULT);
             nMN.createNotificationChannel(notificationChannel);
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "4567")
+        builder = new NotificationCompat.Builder(this, "4567")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(getText(R.string.notification_title))
-                .setContentText(getText(R.string.notification_body))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setContentTitle(getText(R.string.notification_title))
+                .setContentText(getText(R.string.notification_body));
 
         notification = builder.build();
         Log.i("BROADCAST", "Before startForeground");
-        startForeground(2, notification);
+        startForeground(NOTIFICATION_ID, notification);
         Log.i("FOREGROUND", "In fore");
 
 
@@ -174,6 +177,10 @@ public class BroadcastService extends Service {
                                     queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
                                 else
                                     queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
+
+                                // Change notification
+                                builder.setContentText(cityName + ", " + stateName);
+                                nMN.notify(NOTIFICATION_ID, builder.build());
                             }
                             prevCityName = cityName;
                         }
