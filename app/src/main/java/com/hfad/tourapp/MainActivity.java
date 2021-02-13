@@ -3,12 +3,7 @@ package com.hfad.tourapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +15,6 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
@@ -28,18 +22,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.os.Looper;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -52,13 +40,10 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -75,10 +60,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String prevCityName;
     private String stateName;
     private RequestQueue queue;
-    public TextToSpeech tts;
+    public static TextToSpeech tts;
     public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
 
-    private BroadcastService broadcastService;
+    private ForegroundService broadcastService;
     private boolean bound = false;
 
     @Override
@@ -132,9 +117,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStart() {
         super.onStart();
         mapView.onStart();
-
-        Intent intent = new Intent(this, BroadcastService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -142,17 +124,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i("RESUMING", "Resuming rn");
         super.onResume();
         mapView.onResume();
-        Intent serviceIntent = new Intent(this, BroadcastService.class);
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
     }
 
     @Override
     protected void onPause() {
-        Log.i("PAUSE", "Pausing rn");
         super.onPause();
         mapView.onPause();
-        Intent serviceIntent = new Intent(this, BroadcastService.class);
-        context.startService(serviceIntent);
+
+        if (!isFinishing()) {
+            Intent serviceIntent = new Intent(this, ForegroundService.class);
+            context.startService(serviceIntent);
+        }
     }
 
     @Override
@@ -160,14 +144,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onStop();
         mapView.onStop();
 
-        if (tts != null){
-            tts.stop();
-        }
-
-        if (bound) {
-            broadcastService.setCallbacks(null); // unregister
-            unbindService(serviceConnection);
-            bound = false;
+        if (isFinishing()) {
+            if (tts != null) {
+                tts.stop();
+            }
         }
     }
 
@@ -180,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             tts.shutdown();
         }
 
-        Intent serviceIntent = new Intent(this, BroadcastService.class);
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
     }
 
@@ -308,14 +288,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String pageId = pages.names().getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
-                        if (tts.isSpeaking())
-                            tts.stop();
+                        if (!tts.isSpeaking())
+                            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
 
-                        Log.d("Hi7",text);
-
-                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-
-                        Log.i("ExtractText", text);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -328,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             // cast the IBinder and get MyService instance
-            BroadcastService.LocalBinder binder = (BroadcastService.LocalBinder) service;
+            ForegroundService.LocalBinder binder = (ForegroundService.LocalBinder) service;
             broadcastService = binder.getService();
             bound = true;
             broadcastService.setCallbacks(MainActivity.this); // register
