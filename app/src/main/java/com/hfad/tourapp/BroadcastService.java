@@ -49,10 +49,10 @@ public class BroadcastService extends Service {
 
         notification = builder.build();
         Log.i("BROADCAST", "Before startForeground");
-        startForeground(1, notification);
+        startForeground(2, notification);
         Log.i("FOREGROUND", "In fore");
         //do heavy work on a background thread
-        stopSelf();
+        //stopSelf();
         return START_NOT_STICKY;
     }
 
