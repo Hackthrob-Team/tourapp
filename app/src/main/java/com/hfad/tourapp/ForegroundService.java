@@ -200,17 +200,18 @@ public class ForegroundService extends Service {
                         String pageId = pages.names().getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
-                        if(prefs.getBoolean("notify", false))
-                            mediaPlayer.start();
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH,null);
-                        }
-                        else{
-                            tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
-                        }
+                        if(!MainActivity.tts.isSpeaking()) {
+                            if (prefs.getBoolean("notify", false))
+                                mediaPlayer.start();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                MainActivity.tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
+                            } else {
+                                MainActivity.tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
+                            }
 
-                        if(prefs.getBoolean("text-to-speech", false) && !MainActivity.tts.isSpeaking())
-                            MainActivity.tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                            if (prefs.getBoolean("text-to-speech", false))// && !MainActivity.tts.isSpeaking())
+                                MainActivity.tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                        }
 
                     } catch (JSONException e) {
                         e.printStackTrace();

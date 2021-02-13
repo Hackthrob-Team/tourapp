@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     unbindService(serviceConnection);
                     bound = false;
                 }
-                Intent serviceIntent = new Intent(MainActivity.this, BroadcastService.class);
+                Intent serviceIntent = new Intent(MainActivity.this, ForegroundService.class);
                 context.startService(serviceIntent);
             }
         });
@@ -324,19 +324,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String pageId = pages.names().getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
-                        if(prefs.getBoolean("notify", false))
-                            mediaPlayer.start();
+                        if(!MainActivity.tts.isSpeaking()) {
+                            if (prefs.getBoolean("notify", false))
+                                mediaPlayer.start();
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH,null);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
+                            } else {
+                                tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
+                            }
+
+                            if (prefs.getBoolean("text-to-speech", false)) //&& !tts.isSpeaking())
+                                tts.speak(text, TextToSpeech.QUEUE_ADD, null);
                         }
-                        else{
-                            tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
-                        }
-
-                        if(prefs.getBoolean("text-to-speech", false) && !tts.isSpeaking())
-                            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
