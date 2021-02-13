@@ -34,8 +34,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +43,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class BroadcastService extends Service {
+public class ForegroundService extends Service {
     private NotificationManager nMN;
     private NotificationChannel notificationChannel;
     private NotificationCompat.Builder builder;
@@ -68,8 +66,8 @@ public class BroadcastService extends Service {
 
     // class used for the client binder
     public class LocalBinder extends Binder {
-        BroadcastService getService() {
-            return BroadcastService.this;
+        ForegroundService getService() {
+            return ForegroundService.this;
         }
     }
 
@@ -85,9 +83,8 @@ public class BroadcastService extends Service {
         Log.i("BROADCAST", "onStartCommand");
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
-
-        serviceCallbacks.doSomething();
+                0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                        | PendingIntent.FLAG_ONE_SHOT);
 
         prefs = getSharedPreferences("com.hfad.tourapp.preferences", MODE_PRIVATE);
         mediaPlayer = MediaPlayer.create(this,R.raw.notification);
@@ -109,9 +106,7 @@ public class BroadcastService extends Service {
                 .setContentText(getText(R.string.notification_body));
 
         notification = builder.build();
-        Log.i("BROADCAST", "Before startForeground");
         startForeground(NOTIFICATION_ID, notification);
-        Log.i("FOREGROUND", "In fore");
 
 
         context = getApplicationContext();
@@ -123,10 +118,6 @@ public class BroadcastService extends Service {
 
         // Set up Volley
         queue = Volley.newRequestQueue(context);
-
-        // Set up TextToSpeech
-        tts = new TextToSpeech(this, status -> {});
-        tts.setLanguage(Locale.US);
 
         // Check to see if permission is granted from previous runs
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -143,11 +134,6 @@ public class BroadcastService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        if (tts != null){
-            tts.stop();
-            tts.shutdown();
-        }
     }
 
     public void setCallbacks(ServiceCallbacks callbacks){
@@ -156,12 +142,10 @@ public class BroadcastService extends Service {
 
     @SuppressLint("MissingPermission")
     public void setUpLocationRequests() {
-        Log.d("Hi2", "here2");
         // Location callback for tracking user's location
         LocationCallback locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.d("Hi3","here3");
                 if (locationResult == null) {
                     return;
                 }
@@ -174,12 +158,10 @@ public class BroadcastService extends Service {
                             Address address = addresses.get(0);
                             cityName = address.getLocality();
                             stateName = address.getAdminArea();
-                            Log.d("Hi4","here4");
 
                             if ((prevCityName == null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
                                 String countryCode = address.getCountryCode();
-                                Log.d("Hi5","here5");
                                 if (countryCode.equals("US"))
                                     queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
                                 else
@@ -218,11 +200,6 @@ public class BroadcastService extends Service {
                         String pageId = pages.names().getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
-                        if (tts.isSpeaking())
-                            tts.stop();
-
-                        Log.d("Hi7",text);
-
                         if(prefs.getBoolean("notify", false))
                             mediaPlayer.start();
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -232,10 +209,9 @@ public class BroadcastService extends Service {
                             tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
                         }
 
-                        if(prefs.getBoolean("text-to-speech", false))
-                            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                        if(prefs.getBoolean("text-to-speech", false) && !MainActivity.tts.isSpeaking())
+                            MainActivity.tts.speak(text, TextToSpeech.QUEUE_ADD, null);
 
-                        Log.i("ExtractText", text);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
