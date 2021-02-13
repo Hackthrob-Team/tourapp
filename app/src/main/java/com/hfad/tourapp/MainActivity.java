@@ -42,9 +42,11 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,6 +59,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private MapView mapView;
+    private GoogleMap gMap;
     private TextView txtCurrentCity;
     private SharedPreferences prefs;
     private SharedPreferences.Editor prefEditor;
@@ -169,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Sets the default preferences for the application
     public void setDefaultPrefs() {
         prefEditor = prefs.edit();
-        prefEditor.putBoolean("summary", true);
+        prefEditor.putBoolean("minimal", false);
         prefEditor.putBoolean("text-to-speech", true);
         prefEditor.putBoolean("notify", true);
         prefEditor.putBoolean("dark-mode", false);
@@ -178,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.e("On map ready", "RUNNING");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -186,6 +190,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST_CODE);
         }
+
+        googleMap.setMyLocationEnabled(true);
+        gMap = googleMap;
     }
 
     @SuppressLint("MissingPermission")
@@ -227,6 +234,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 queue.add(makeRequest(cityName, stateName));
                             }
                             prevCityName = cityName;
+                            if (gMap != null)
+                                gMap.moveCamera(CameraUpdateFactory.
+                                        newLatLngZoom(new LatLng(lat, lng), gMap.getCameraPosition().zoom));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -244,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 locationCallback,
                 Looper.getMainLooper());
     }
-    
+
     private JsonObjectRequest makeRequest(String city, String state) {
         // Code to make a city request
         return new JsonObjectRequest(Request.Method.GET, String.format("%s%s, %s", WIKIPEDIA_BASE_URL, city, state), null,
