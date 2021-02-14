@@ -46,6 +46,12 @@ A significant challenge we ran into was deciding which type of Android service t
 - Geofencing to get nearby tourist attractions and points of interest
 - Supporting all of the countries in the world
 
+## Developers
+
+- [Michael Dressner](https://github.com/michaeldressner) - University of Maryland, US
+- [Tanuja Kirthi Doddapaneni](https://github.com/tanuja3) - Birla Institute of Technology and Science, India
+- [Joseph Barshay](https://github.com/gagusftw) - Florida State Univerity, US
+
 ## Resource Credits
 - [city.svg](https://www.flaticon.com/free-icon/city_3310572?term=city%20location&page=2&position=74&page=2&position=74&related_id=3310572) - Created by ultimatearm, hosted on flaticon.com
 - [square.svg](https://www.flaticon.com/free-icon/square_2627936?term=square&page=1&position=14&page=1&position=14&related_id=2627936&) - Created by Vitaly Gorbachev, hosted on flaticon.com
