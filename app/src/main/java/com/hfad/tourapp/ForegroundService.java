@@ -40,15 +40,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
+import java.util.Objects;
 
 
 public class ForegroundService extends Service {
     private NotificationManager nMN;
-    private NotificationChannel notificationChannel;
     private NotificationCompat.Builder builder;
-    private Notification notification;
-    private Context context;
     private Geocoder geocoder;
     private String cityName;
     private SharedPreferences prefs;
@@ -56,24 +53,19 @@ public class ForegroundService extends Service {
     private String stateName;
     private RequestQueue queue;
     private MediaPlayer mediaPlayer;
-    private final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
-    private final String CHANNEL_ID = "4567";
     private final int NOTIFICATION_ID = 2;
 
     private final IBinder binder = new LocalBinder();
-    private ServiceCallbacks serviceCallbacks;
 
     // class used for the client binder
-    public class LocalBinder extends Binder {
-        ForegroundService getService() {
-            return ForegroundService.this;
-        }
+    public static class LocalBinder extends Binder {
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        //throw new UnsupportedOperationException("Not yet implemented");
+        /*
+            throw new UnsupportedOperationException("Not yet implemented");
+        */
         return binder;
     }
 
@@ -91,7 +83,8 @@ public class ForegroundService extends Service {
         nMN = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationChannel = new NotificationChannel(CHANNEL_ID,
+            String CHANNEL_ID = "4567";
+            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                     "Tours",
                     NotificationManager.IMPORTANCE_DEFAULT);
             nMN.createNotificationChannel(notificationChannel);
@@ -104,11 +97,11 @@ public class ForegroundService extends Service {
                 .setContentTitle(getText(R.string.notification_title))
                 .setContentText(getText(R.string.notification_body));
 
-        notification = builder.build();
+        Notification notification = builder.build();
         startForeground(NOTIFICATION_ID, notification);
 
 
-        context = getApplicationContext();
+        Context context = getApplicationContext();
 
         //do heavy work on a background thread
 
@@ -133,10 +126,6 @@ public class ForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-    }
-
-    public void setCallbacks(ServiceCallbacks callbacks){
-        serviceCallbacks = callbacks;
     }
 
     @SuppressLint("MissingPermission")
@@ -179,9 +168,9 @@ public class ForegroundService extends Service {
                                             TextToSpeech.QUEUE_ADD, null);
                                 else {
                                     if (countryCode.equals("US"))
-                                        queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
+                                        queue.add(makeRequest(cityName, stateName));
                                     else
-                                        queue.add(makeRequest(cityName, address.getCountryName(), "%s%s, %s"));
+                                        queue.add(makeRequest(cityName, address.getCountryName()));
                                 }
 
                                 // Change notification
@@ -207,14 +196,15 @@ public class ForegroundService extends Service {
                 Looper.getMainLooper());
     }
 
-    private JsonObjectRequest makeRequest(String city, String state, String formatString) {
+    private JsonObjectRequest makeRequest(String city, String state) {
         // Code to make a city request
-        return new JsonObjectRequest(Request.Method.GET, String.format(formatString, WIKIPEDIA_BASE_URL, city, state), null,
+        String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
+        return new JsonObjectRequest(Request.Method.GET, String.format("%s%s, %s", WIKIPEDIA_BASE_URL, city, state), null,
                 response -> {
                     try {
                         JSONObject pages = response.getJSONObject("query")
                                 .getJSONObject("pages");
-                        String pageId = pages.names().getString(0);
+                        String pageId = Objects.requireNonNull(pages.names()).getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
                         if (prefs.getBoolean("speech-limit", SettingsActivity.DEFAULT_SPEECH_LIMIT)) {

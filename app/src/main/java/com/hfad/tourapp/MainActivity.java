@@ -50,7 +50,9 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private LocationCallback locationCallback;
     private MapView mapView;
+    private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap gMap;
     private TextView txtCurrentCity;
     private SharedPreferences prefs;
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set up TextToSpeech
         tts = new TextToSpeech(this, status -> {});
         tts.setLanguage(Locale.US);
-        tts.setPitch(1.3f);
+        tts.setPitch(1.25f);
 
         // Check to see if permission is granted from previous runs
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -154,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.onPause();
 
         if (!isFinishing()) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
             Intent serviceIntent = new Intent(this, ForegroundService.class);
             context.startService(serviceIntent);
         }
@@ -244,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @SuppressLint("MissingPermission")
     public void setUpLocationRequests() {
         // Location callback for tracking user's location
-        LocationCallback locationCallback = new LocationCallback() {
+        locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) {
@@ -306,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .setInterval(1000)
                 .setFastestInterval(500)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(
                 this);
         fusedLocationClient.requestLocationUpdates(locationRequest,
                 locationCallback,
