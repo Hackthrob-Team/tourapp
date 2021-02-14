@@ -17,6 +17,10 @@ import androidx.appcompat.widget.SwitchCompat;
 
 public class SettingsActivity extends AppCompatActivity {
     public static final String TAG = "SettingsActivity";
+    public static final boolean DEFAULT_WELCOME = false;
+    public static final boolean DEFAULT_NOTIFY = true;
+    public static final boolean DEFAULT_SPEECH_LIMIT = false;
+    public static final int DEFAULT_WORD_COUNT = 100;
     private SwitchCompat swWelcome; //Will only the location be announced or a summary from Wikipedia?
     private SwitchCompat swNotify;  //Will notifications to announce when entering city be used?
     private SwitchCompat swSpeechLimit;    //Will dark mode be enabled?
@@ -42,12 +46,13 @@ public class SettingsActivity extends AppCompatActivity {
         tvWordCount = findViewById(R.id.tvWordCount);
         prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
 
-        if(prefs.getBoolean("welcome", false))
+        if(prefs.getBoolean("welcome", DEFAULT_WELCOME))
             swWelcome.setChecked(true);
-        if(prefs.getBoolean("notify", false))
+        if(prefs.getBoolean("notify", DEFAULT_NOTIFY))
             swNotify.setChecked(true);
-        if(prefs.getBoolean("speech-limit", false))
+        if(prefs.getBoolean("speech-limit", DEFAULT_SPEECH_LIMIT))
             swSpeechLimit.setChecked(true);
+        sbWords.setProgress(prefs.getInt("word-count", DEFAULT_WORD_COUNT));
 
         tvWordCount.setText(sbWords.getProgress() + " words");
 
@@ -59,6 +64,15 @@ public class SettingsActivity extends AppCompatActivity {
                 prefEditor = prefs.edit();
                 prefEditor.putBoolean("welcome", isChecked);
                 prefEditor.apply();
+
+                if (isChecked) {
+                    swSpeechLimit.setEnabled(false);
+                    sbWords.setEnabled(false);
+                }
+                else {
+                    swSpeechLimit.setEnabled(true);
+                    sbWords.setEnabled(true);
+                }
             }
         });
 
@@ -77,6 +91,9 @@ public class SettingsActivity extends AppCompatActivity {
                 prefEditor = prefs.edit();
                 prefEditor.putBoolean("speech-limit", isChecked);
                 prefEditor.apply();
+
+                if (isChecked) sbWords.setEnabled(true);
+                else sbWords.setEnabled(false);
             }
         });
 
@@ -86,6 +103,7 @@ public class SettingsActivity extends AppCompatActivity {
                 prefEditor = prefs.edit();
                 tvWordCount.setText(sbWords.getProgress() + " words");
                 prefEditor.putInt("word-count", sbWords.getProgress());
+                prefEditor.apply();
             }
 
             @Override

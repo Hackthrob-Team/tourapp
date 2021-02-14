@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set up TextToSpeech
         tts = new TextToSpeech(this, status -> {});
         tts.setLanguage(Locale.US);
+        tts.setPitch(1.3f);
 
         // Check to see if permission is granted from previous runs
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -204,12 +205,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Sets the default preferences for the application
     public void setDefaultPrefs() {
-        SharedPreferences.Editor prefEditor = prefs.edit();
-        prefEditor.putBoolean("welcome", true);
-        prefEditor.putBoolean("notify", true);
-        prefEditor.putBoolean("speech-limit", false);
-        prefEditor.putInt("word-count", 100);
-        prefEditor.apply();
+//        SharedPreferences.Editor prefEditor = prefs.edit();
+//        prefEditor.putBoolean("welcome", true);
+//        prefEditor.putBoolean("notify", true);
+//        prefEditor.putBoolean("speech-limit", false);
+//        prefEditor.putInt("word-count", 100);
+//        prefEditor.apply();
     }
 
     @Override
@@ -264,10 +265,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             if ((prevCityName == null && cityName != null) || (prevCityName != null &&
                                     !cityName.equals(prevCityName))) {
+                                if (MainActivity.tts.isSpeaking())
+                                    MainActivity.tts.stop();
+
+                                if (prefs.getBoolean("notify", SettingsActivity.DEFAULT_NOTIFY)) {
+                                    mediaPlayer.start();
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        MainActivity.tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
+                                    } else {
+                                        MainActivity.tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
+                                    }
+                                }
+
                                 String countryCode = address.getCountryCode();
-                                if (prefs.getBoolean("summary", false))
+
+                                if (prefs.getBoolean("welcome", SettingsActivity.DEFAULT_WELCOME))
                                     tts.speak("Welcome to " + cityName + ", " + stateName,
-                                            TextToSpeech.QUEUE_FLUSH, null);
+                                            TextToSpeech.QUEUE_ADD, null);
                                 else {
                                     if (countryCode.equals("US"))
                                         queue.add(makeRequest(cityName, stateName));
@@ -309,23 +323,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String pageId = Objects.requireNonNull(pages.names()).getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
-                        if(!MainActivity.tts.isSpeaking()) {
-                            if (prefs.getBoolean("notify", false))
-                                mediaPlayer.start();
-                            if (MainActivity.tts.isSpeaking())
-                                MainActivity.tts.stop();
+                        if (prefs.getBoolean("speech-limit", SettingsActivity.DEFAULT_SPEECH_LIMIT)) {
+                            int wordCount = prefs.getInt("word-count", SettingsActivity.DEFAULT_WORD_COUNT);
 
-                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                            String[] words = text.split(" ");
+                            text = "";
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
-                            } else {
-                                tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
+                            for (int i = 0; i < words.length && i < wordCount; ++i) {
+                                text += words[i] + " ";
                             }
-
-                            if (prefs.getBoolean("text-to-speech", false)) //&& !tts.isSpeaking())
-                                tts.speak(text, TextToSpeech.QUEUE_ADD, null);
                         }
+
+                        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

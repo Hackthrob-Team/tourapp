@@ -160,10 +160,23 @@ public class ForegroundService extends Service {
 
                             if ((prevCityName != null && cityName != null &&
                                     !cityName.equals(prevCityName))) {
+                                if (MainActivity.tts.isSpeaking())
+                                    MainActivity.tts.stop();
+
+                                if (prefs.getBoolean("notify", SettingsActivity.DEFAULT_NOTIFY)) {
+                                    mediaPlayer.start();
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        MainActivity.tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
+                                    } else {
+                                        MainActivity.tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
+                                    }
+                                }
+
                                 String countryCode = address.getCountryCode();
-                                if (prefs.getBoolean("summary", false))
+
+                                if (prefs.getBoolean("welcome", SettingsActivity.DEFAULT_WELCOME))
                                     MainActivity.tts.speak("Welcome to " + cityName + ", " + stateName,
-                                            TextToSpeech.QUEUE_FLUSH, null);
+                                            TextToSpeech.QUEUE_ADD, null);
                                 else {
                                     if (countryCode.equals("US"))
                                         queue.add(makeRequest(cityName, stateName, "%s%s, %s"));
@@ -204,20 +217,19 @@ public class ForegroundService extends Service {
                         String pageId = pages.names().getString(0);
                         String text = pages.getJSONObject(pageId).getString("extract");
 
-                        if(MainActivity.tts.isSpeaking()) {
-                            MainActivity.tts.stop();
-                            Log.i("REQUEST", "In request block");
-                            if (prefs.getBoolean("notify", false))
-                                mediaPlayer.start();
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                MainActivity.tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
-                            } else {
-                                MainActivity.tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
-                            }
+                        if (prefs.getBoolean("speech-limit", SettingsActivity.DEFAULT_SPEECH_LIMIT)) {
+                            int wordCount = prefs.getInt("word-count", SettingsActivity.DEFAULT_WORD_COUNT);
 
-                            if (prefs.getBoolean("text-to-speech", false))// && !MainActivity.tts.isSpeaking())
-                                MainActivity.tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                            String[] words = text.split(" ");
+                            text = "";
+
+                            for (int i = 0; i < words.length && i < wordCount; ++i) {
+                                text += words[i] + " ";
+                            }
                         }
+
+
+                        MainActivity.tts.speak(text, TextToSpeech.QUEUE_ADD, null);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
