@@ -50,8 +50,13 @@ public class SettingsActivity extends AppCompatActivity {
             swWelcome.setChecked(true);
         if(prefs.getBoolean("notify", DEFAULT_NOTIFY))
             swNotify.setChecked(true);
-        if(prefs.getBoolean("speech-limit", DEFAULT_SPEECH_LIMIT))
+        if(prefs.getBoolean("speech-limit", DEFAULT_SPEECH_LIMIT)) {
             swSpeechLimit.setChecked(true);
+            sbWords.setEnabled(true);
+        } else {
+            swSpeechLimit.setChecked(false);
+            sbWords.setEnabled(false);
+        }
         sbWords.setProgress(prefs.getInt("word-count", DEFAULT_WORD_COUNT));
 
         tvWordCount.setText(sbWords.getProgress() + " words");
