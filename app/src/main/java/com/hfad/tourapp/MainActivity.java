@@ -2,6 +2,7 @@ package com.hfad.tourapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -193,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fusedLocationClient.removeLocationUpdates(locationCallback);
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
+        instanceRunning = false;
     }
 
     @Override
