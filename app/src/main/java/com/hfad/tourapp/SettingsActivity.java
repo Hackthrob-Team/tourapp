@@ -108,6 +108,12 @@ public class SettingsActivity extends AppCompatActivity {
         swSpeechLimit.setChecked(prefs.getBoolean("speech-limit", DEFAULT_SPEECH_LIMIT));
         sbWords.setProgress(prefs.getInt("word-count", DEFAULT_WORD_COUNT));
 
+        if (swSpeechLimit.isChecked()) {
+            sbWords.setEnabled(true);
+        } else {
+            sbWords.setEnabled(false);
+        }
+
         tvWordCount.setText(sbWords.getProgress() + " words");
     }
 
