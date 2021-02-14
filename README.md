@@ -1,5 +1,13 @@
 # Tour App
 
+## Demo Video
+
+https://www.youtube.com/watch?v=MLkRKMfC6gA
+
+## Screenshots
+
+https://imgur.com/a/nwfsU9b
+
 ## Inspiration
 
 Geographic illiteracy is a serious issue in the United States (and other places around the world as well), especially since the topic is frequently eliminated from school curricula and combined or replaced with other topics, such as social studies or economics. According to some, this knowledge gap may pose a security threat, as it is important for even the average citizen to be able to pinpoint the locations of important places within their country or countries that they are at war with, for example. For a country to be successful, especially in democratic governments, it is important for the citizens who live in it to be more geographically aware.
