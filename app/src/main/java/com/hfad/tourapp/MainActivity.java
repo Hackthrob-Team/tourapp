@@ -25,6 +25,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -74,11 +78,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
 //        ProcessLifecycleOwner.get().getLifecycle().addObserver(new LifecycleObserver() {
-//            @OnLifecycleEvent(Lifecycle.Event.ON_START)
-//            void startForegroundTasks() {
-//                Log.i("FOREGROUND", "In fore");
-//            }
-//
 //            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
 //            void startBackgroundTasks() {
 //                Log.i("FOREGROUND", "Out fore");
@@ -89,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                 */
 //
 //                Intent serviceIntent = new Intent(MainActivity.this, ForegroundService.class);
+//                serviceIntent.putExtra("city", cityName);
+//                serviceIntent.putExtra("state", stateName);
 //                context.startService(serviceIntent);
 //            }
 //        });
@@ -219,6 +220,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        prefEditor.putBoolean("speech-limit", false);
 //        prefEditor.putInt("word-count", 100);
 //        prefEditor.apply();
+    }
+
+    public static void setRunningFlag() {
+        instanceRunning = true;
     }
 
     @Override
