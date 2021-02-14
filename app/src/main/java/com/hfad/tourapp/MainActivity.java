@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String prevCityName;
     private String stateName;
     private RequestQueue queue;
+    private static boolean instanceRunning = false;
     public static TextToSpeech tts;
     public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
 
@@ -124,7 +125,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 == PackageManager.PERMISSION_GRANTED ||
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
-            setUpLocationRequests();
+            if (!instanceRunning) {
+                setUpLocationRequests();
+                instanceRunning = true;
+            }
         }
     }
 
@@ -156,8 +160,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.onPause();
 
         if (!isFinishing()) {
-            fusedLocationClient.removeLocationUpdates(locationCallback);
             Intent serviceIntent = new Intent(this, ForegroundService.class);
+            serviceIntent.putExtra("city", cityName);
+            serviceIntent.putExtra("state", stateName);
             context.startService(serviceIntent);
         }
     }
@@ -239,6 +244,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED ||
                 grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 setUpLocationRequests();
+                instanceRunning = true;
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

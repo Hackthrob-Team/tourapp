@@ -80,6 +80,9 @@ public class ForegroundService extends Service {
         prefs = getSharedPreferences("com.hfad.tourapp.preferences", MODE_PRIVATE);
         mediaPlayer = MediaPlayer.create(this,R.raw.notification);
 
+        cityName = intent.getStringExtra("city");
+        stateName = intent.getStringExtra("state");
+
         nMN = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -95,7 +98,7 @@ public class ForegroundService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setContentTitle(getText(R.string.notification_title))
-                .setContentText(getText(R.string.notification_body));
+                .setContentText(cityName + ", " + stateName);
 
         Notification notification = builder.build();
         startForeground(NOTIFICATION_ID, notification);
@@ -149,30 +152,6 @@ public class ForegroundService extends Service {
 
                             if ((prevCityName != null && cityName != null &&
                                     !cityName.equals(prevCityName))) {
-                                if (MainActivity.tts.isSpeaking())
-                                    MainActivity.tts.stop();
-
-                                if (prefs.getBoolean("notify", SettingsActivity.DEFAULT_NOTIFY)) {
-                                    mediaPlayer.start();
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        MainActivity.tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
-                                    } else {
-                                        MainActivity.tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
-                                    }
-                                }
-
-                                String countryCode = address.getCountryCode();
-
-                                if (prefs.getBoolean("welcome", SettingsActivity.DEFAULT_WELCOME))
-                                    MainActivity.tts.speak("Welcome to " + cityName + ", " + stateName,
-                                            TextToSpeech.QUEUE_ADD, null);
-                                else {
-                                    if (countryCode.equals("US"))
-                                        queue.add(makeRequest(cityName, stateName));
-                                    else
-                                        queue.add(makeRequest(cityName, address.getCountryName()));
-                                }
-
                                 // Change notification
                                 builder.setContentText(cityName + ", " + stateName);
                                 nMN.notify(NOTIFICATION_ID, builder.build());
