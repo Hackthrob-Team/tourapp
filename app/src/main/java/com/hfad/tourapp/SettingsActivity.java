@@ -46,21 +46,6 @@ public class SettingsActivity extends AppCompatActivity {
         tvWordCount = findViewById(R.id.tvWordCount);
         prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
 
-        if(prefs.getBoolean("welcome", DEFAULT_WELCOME))
-            swWelcome.setChecked(true);
-        if(prefs.getBoolean("notify", DEFAULT_NOTIFY))
-            swNotify.setChecked(true);
-        if(prefs.getBoolean("speech-limit", DEFAULT_SPEECH_LIMIT)) {
-            swSpeechLimit.setChecked(true);
-            sbWords.setEnabled(true);
-        } else {
-            swSpeechLimit.setChecked(false);
-            sbWords.setEnabled(false);
-        }
-        sbWords.setProgress(prefs.getInt("word-count", DEFAULT_WORD_COUNT));
-
-        tvWordCount.setText(sbWords.getProgress() + " words");
-
         //Setting up listeners for switches
 
         swWelcome.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -117,6 +102,13 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
+
+        swWelcome.setChecked(prefs.getBoolean("welcome", DEFAULT_WELCOME));
+        swNotify.setChecked(prefs.getBoolean("notify", DEFAULT_NOTIFY));
+        swSpeechLimit.setChecked(prefs.getBoolean("speech-limit", DEFAULT_SPEECH_LIMIT));
+        sbWords.setProgress(prefs.getInt("word-count", DEFAULT_WORD_COUNT));
+
+        tvWordCount.setText(sbWords.getProgress() + " words");
     }
 
     @Override
