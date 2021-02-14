@@ -40,6 +40,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -188,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             tts.shutdown();
         }
 
+        fusedLocationClient.removeLocationUpdates(locationCallback);
         Intent serviceIntent = new Intent(this, ForegroundService.class);
         stopService(serviceIntent);
     }
@@ -297,11 +300,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     else
                                         queue.add(makeRequest(cityName, address.getCountryName()));
                                 }
+
+                                if (gMap != null) {
+                                    lat = address.getLatitude();
+                                    lng = address.getLongitude();
+                                    gMap.addMarker(new MarkerOptions()
+                                            .position(new LatLng(lat, lng))
+                                            .title(cityName + ", " + stateName)
+                                    );
+                                    gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                            new LatLng(lat, lng), 14
+                                    ));
+                                }
                             }
                             prevCityName = cityName;
-                            if (gMap != null)
-                                gMap.moveCamera(CameraUpdateFactory.
-                                        newLatLngZoom(new LatLng(lat, lng), gMap.getCameraPosition().zoom));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
