@@ -174,36 +174,4 @@ public class ForegroundService extends Service {
                 locationCallback,
                 Looper.getMainLooper());
     }
-
-    private JsonObjectRequest makeRequest(String city, String state) {
-        // Code to make a city request
-        String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
-        return new JsonObjectRequest(Request.Method.GET, String.format("%s%s, %s", WIKIPEDIA_BASE_URL, city, state), null,
-                response -> {
-                    try {
-                        JSONObject pages = response.getJSONObject("query")
-                                .getJSONObject("pages");
-                        String pageId = Objects.requireNonNull(pages.names()).getString(0);
-                        String text = pages.getJSONObject(pageId).getString("extract");
-
-                        if (prefs.getBoolean("speech-limit", SettingsActivity.DEFAULT_SPEECH_LIMIT)) {
-                            int wordCount = prefs.getInt("word-count", SettingsActivity.DEFAULT_WORD_COUNT);
-
-                            String[] words = text.split(" ");
-                            text = "";
-
-                            for (int i = 0; i < words.length && i < wordCount; ++i) {
-                                text += words[i] + " ";
-                            }
-                        }
-
-
-                        MainActivity.tts.speak(text, TextToSpeech.QUEUE_ADD, null);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }, error -> Log.e("ExtractText", "Error"));
-    }
 }

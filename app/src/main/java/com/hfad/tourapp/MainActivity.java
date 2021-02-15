@@ -48,9 +48,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private LocationCallback locationCallback;
@@ -69,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private RequestQueue queue;
     private static boolean instanceRunning = false;
     public static TextToSpeech tts;
-    public static final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
+    private Set<String> visitedPlaces;
+    private final String WIKIPEDIA_BASE_URL = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&format=json&redirects&titles=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
             if (!instanceRunning) {
+                visitedPlaces = new HashSet<>();
                 setUpLocationRequests();
                 instanceRunning = true;
             }
@@ -276,22 +280,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                             address.getLocality(), address.getAdminArea()));
                             cityName = address.getLocality();
                             stateName = address.getAdminArea();
+                            String countryCode = address.getCountryCode();
+                            String placeKey = cityName + "," + stateName + "," + countryCode;
 
-                            if ((prevCityName == null && cityName != null) || (prevCityName != null &&
-                                    !cityName.equals(prevCityName))) {
-                                if (MainActivity.tts.isSpeaking())
-                                    MainActivity.tts.stop();
+                            if (((prevCityName == null && cityName != null) || (prevCityName != null &&
+                                    !cityName.equals(prevCityName))) && !visitedPlaces.contains(placeKey)) {
+                                visitedPlaces.add(placeKey);
 
                                 if (prefs.getBoolean("notify", SettingsActivity.DEFAULT_NOTIFY)) {
                                     mediaPlayer.start();
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        MainActivity.tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
+                                        MainActivity.tts.playSilentUtterance(2000, TextToSpeech.QUEUE_ADD, null);
                                     } else {
-                                        MainActivity.tts.playSilence(2000, TextToSpeech.QUEUE_FLUSH, null);
+                                        MainActivity.tts.playSilence(2000, TextToSpeech.QUEUE_ADD, null);
                                     }
                                 }
-
-                                String countryCode = address.getCountryCode();
 
                                 if (prefs.getBoolean("welcome", SettingsActivity.DEFAULT_WELCOME))
                                     tts.speak("Welcome to " + cityName + ", " + stateName,
