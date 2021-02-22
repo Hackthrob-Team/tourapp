@@ -1,4 +1,4 @@
-package com.hfad.tourapp;
+package com.tourapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -44,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
         swSpeechLimit = findViewById(R.id.swSpeechLimit);
         sbWords = findViewById(R.id.sbWords);
         tvWordCount = findViewById(R.id.tvWordCount);
-        prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
+        prefs = getSharedPreferences("com.tourapp.preferences", Context.MODE_PRIVATE);
 
         //Setting up listeners for switches
 
