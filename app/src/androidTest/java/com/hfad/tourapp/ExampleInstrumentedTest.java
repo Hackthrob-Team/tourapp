@@ -1,4 +1,4 @@
-package com.hfad.tourapp;
+package com.tourapp;
 
 import android.content.Context;
 
