@@ -151,6 +151,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStart() {
         super.onStart();
         mapView.onStart();
+
+        // To check the text on home page
+        String currentCity = (String) txtCurrentCity.getText();
+        if(currentCity.equals("Current city: Getting location...")){
+            instanceRunning = false;
+            Log.d("GETTING LOCATION", "onStart");
+        }
     }
 
     @Override
