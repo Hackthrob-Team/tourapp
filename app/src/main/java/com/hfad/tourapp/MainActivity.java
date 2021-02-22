@@ -1,4 +1,4 @@
-package com.hfad.tourapp;
+package com.tourapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //            }
 //        });
 
-        prefs = getSharedPreferences("com.hfad.tourapp.preferences", Context.MODE_PRIVATE);
+        prefs = getSharedPreferences("com.tourapp.preferences", Context.MODE_PRIVATE);
         mediaPlayer = MediaPlayer.create(this, R.raw.notification);
         setDefaultPrefs();
 
