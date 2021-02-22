@@ -77,7 +77,7 @@ public class ForegroundService extends Service {
                 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
                         | PendingIntent.FLAG_ONE_SHOT);
 
-        prefs = getSharedPreferences("com.hfad.tourapp.preferences", MODE_PRIVATE);
+        prefs = getSharedPreferences("com.tourapp.preferences", MODE_PRIVATE);
         mediaPlayer = MediaPlayer.create(this,R.raw.notification);
 
         cityName = intent.getStringExtra("city");
